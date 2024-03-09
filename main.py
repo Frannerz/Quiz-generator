@@ -1,8 +1,16 @@
 import requests
 import random
+import html
 
 question_number = 0
 score = 0
+data = None
+question = None
+correct_answer = None
+incorrect_answers = None
+quiz = {}
+# char_strings = ['&ldquo;','&quot;', '&oacute;','&#039;','&rsquo;']
+# char_string_replace = [""]
 
 def generate_random_num(length):
     return random.randint(0,length)
@@ -17,60 +25,97 @@ def increase_question_number():
     global question_number
     question_number+=1
 
-def correct_answer():
+def handle_correct_answer():
     print("That's correct!")
     increase_score()
     increase_question_number()
     generate_new_question()
 
-def incorrect_answer():
-    print("Sorry, that's incorrect")
+def handle_incorrect_answer():
+    global correct_answer
+    print(f"Sorry, that's incorrect. The correct answer is {correct_answer}")
     increase_question_number()
     generate_new_question()
 
-def check_answer(user_response, data):
+def check_answer(user_response):
+    global data
     if user_response == data['results'][0]['correct_answer']:
-        correct_answer()
+        handle_correct_answer()
     else:
-        incorrect_answer()
+        handle_incorrect_answer()
 
-def true_or_false_question(question, data):
+def format_answers(answers):
+    for word in answers:
+        html.unescape(word)
+    return answers
+
+def true_or_false_question():
+    global question, data
     print('True or false?', question)
     user_response = input("Type 'true' or 'false'")
-    check_answer(user_response, data)
+    check_answer(user_response)
 
-def multiple_choice_question(data):
-    correct_answers = data['results'][0]['correct_answer']
-    incorrect_answers = data['results'][0]['incorrect_answers']
-    random_num = generate_random_num(len(incorrect_answers))
+
+
+def multiple_choice_question():
+    global correct_answer, question, incorrect_answers, data
+    random_num = generate_random_num(len(incorrect_answers))  # And this line
     possible_answers = incorrect_answers[:]
-    possible_answers.insert(random_num, correct_answers)
+    possible_answers.insert(random_num, correct_answer)
+    possible_answers = format_answers(possible_answers)
+    print(question)
     print(possible_answers)
     user_response = input('Enter the correct answer. Make sure you check your spelling!')
-    check_answer(user_response, data)
+    check_answer(user_response)
 
-def check_question_type(data):
-    question = data['results'][0]['question'] 
-    print(question)
+def check_question_type():
+    global question, data
     type = data['results'][0]['type']
     if type == 'boolean':
-        true_or_false_question(question, data)
+        true_or_false_question()
     if type == 'multiple':
-        multiple_choice_question(data)
+        multiple_choice_question()
 
+# def format_string(string):
+#     global char_strings
+#     pass
+
+def get_question():
+    global question
+    question = data['results'][0]['question'] 
+    question = html.unescape(question)
+
+
+
+
+def get_answers():
+    global correct_answer, incorrect_answers, data
+    correct_answer = data['results'][0]['correct_answer']
+    incorrect_answers = data['results'][0]['incorrect_answers']
+    return correct_answer, incorrect_answers
+
+def create_quiz_question():
+    global question_number, correct_answer, incorrect_answers, quiz, question, answer
+    quiz[question_number+1] = {'question': question, 'correct answer': correct_answer, 'incorrect answers': incorrect_answers or []}  
+    
 def generate_new_question():
+    global data, quiz
     if question_number <10:
         response = requests.get(url)
         data = response.json()
-        check_question_type(data)
+        get_question()
+        get_answers()
+        create_quiz_question()
+        check_question_type()
     else:
         print(f'End of quiz, you scored {score}')
+        print(quiz)
 
 
 def start_quiz():
     generate_new_question()
 
-print('Welcome to the Film Quiz!')
+print('Welcome to the Quiz!')
 are_you_ready = input("Are you ready? Type 'yes' or 'no'!")
 
 if are_you_ready == 'yes':
@@ -102,7 +147,7 @@ if are_you_ready == 'yes':
 # add in choice of quiz type at start
 # add questions to array/object
 # add each object to a file
-
+# handle errors!!
 
 # You should use:
 # done:
