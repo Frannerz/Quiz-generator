@@ -2,7 +2,7 @@ import requests
 import random
 import html
 
-question_number = 0
+question_number = 1
 score = 0
 data = None
 question = None
@@ -26,46 +26,46 @@ def increase_question_number():
     question_number+=1
 
 def handle_correct_answer():
-    print("That's correct!")
+    print("\nThat's correct!\n\n")
     increase_score()
     increase_question_number()
     generate_new_question()
 
 def handle_incorrect_answer():
     global correct_answer
-    print(f"Sorry, that's incorrect. The correct answer is {correct_answer}")
+    print(f"\nSorry, that's incorrect. The correct answer is {correct_answer}\n\n")
     increase_question_number()
     generate_new_question()
 
 def check_answer(user_response):
-    global data
-    if user_response == data['results'][0]['correct_answer']:
+    global data, correct_answer
+    if user_response.lower() == correct_answer.lower():
         handle_correct_answer()
     else:
         handle_incorrect_answer()
 
 def format_answers(answers):
-    for word in answers:
-        html.unescape(word)
-    return answers
+    return [html.unescape(word) for word in answers]
 
 def true_or_false_question():
     global question, data
-    print('True or false?', question)
-    user_response = input("Type 'true' or 'false'")
+    print(f"{question_number}. {question}\n")
+    user_response = input("Type 'True' or 'False': ")
     check_answer(user_response)
 
-
-
+def format_multiple_choice_answers(answers):
+    return ', '.join(answers[0:3])+ " or "+ answers[3] +"?"
+    
 def multiple_choice_question():
-    global correct_answer, question, incorrect_answers, data
-    random_num = generate_random_num(len(incorrect_answers))  # And this line
+    global correct_answer, question, incorrect_answers, data, question_number
+    random_num = generate_random_num(len(incorrect_answers))  
     possible_answers = incorrect_answers[:]
     possible_answers.insert(random_num, correct_answer)
     possible_answers = format_answers(possible_answers)
-    print(question)
-    print(possible_answers)
-    user_response = input('Enter the correct answer. Make sure you check your spelling!')
+    possible_answers = format_multiple_choice_answers(possible_answers)
+    print(f"{question_number}. {question}\n")
+    print(possible_answers, "\n")
+    user_response = input('Enter the correct answer: ')
     check_answer(user_response)
 
 def check_question_type():
@@ -86,8 +86,6 @@ def get_question():
     question = html.unescape(question)
 
 
-
-
 def get_answers():
     global correct_answer, incorrect_answers, data
     correct_answer = data['results'][0]['correct_answer']
@@ -96,11 +94,11 @@ def get_answers():
 
 def create_quiz_question():
     global question_number, correct_answer, incorrect_answers, quiz, question, answer
-    quiz[question_number+1] = {'question': question, 'correct answer': correct_answer, 'incorrect answers': incorrect_answers or []}  
+    quiz[question_number] = {'question': question, 'correct answer': correct_answer, 'incorrect answers': incorrect_answers or []}  
     
 def generate_new_question():
     global data, quiz
-    if question_number <10:
+    if question_number <11:
         response = requests.get(url)
         data = response.json()
         get_question()
@@ -108,15 +106,16 @@ def generate_new_question():
         create_quiz_question()
         check_question_type()
     else:
-        print(f'End of quiz, you scored {score}')
+        print(f'\nEnd of quiz, you scored {score}\n')
         print(quiz)
 
 
 def start_quiz():
+    print("\n")
     generate_new_question()
 
-print('Welcome to the Quiz!')
-are_you_ready = input("Are you ready? Type 'yes' or 'no'!")
+print('Welcome to the Quiz!\n')
+are_you_ready = input("Are you ready? Type 'yes' or 'no'! ")
 
 if are_you_ready == 'yes':
     start_quiz()
