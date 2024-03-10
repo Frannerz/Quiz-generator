@@ -3,8 +3,10 @@ import random
 import html
 import csv
 
+index = 0
 question_number = 1
 score = 0
+chosen_genre = None
 data = None
 question = None
 correct_answer = None
@@ -15,8 +17,8 @@ quiz = {}
 def generate_random_num(length):
     return random.randint(0,length)
 
-url = 'https://opentdb.com/api.php?amount=1&category=9'
-
+urls = ['https://opentdb.com/api.php?amount=10&category=9','https://opentdb.com/api.php?amount=10&category=11','https://opentdb.com/api.php?amount=10&category=12','https://opentdb.com/api.php?amount=10&category=14','https://opentdb.com/api.php?amount=10&category=17','https://opentdb.com/api.php?amount=10&category=21','https://opentdb.com/api.php?amount=10&category=23', 'https://opentdb.com/api.php?amount=10&category=22']
+#0:general knowledge, 1:film, 2:music, 3:television, 4:science and nature, 5:sports, 6:history, 7:geography
 def increase_score():
     global score
     score+=1
@@ -25,17 +27,30 @@ def increase_question_number():
     global question_number
     question_number+=1
 
+def increase_index_number():
+    global index
+    index+=1
+
 def handle_correct_answer():
     print("\nThat's correct!\n\n")
     increase_score()
     increase_question_number()
-    generate_new_question()
+    increase_index_number()
+    get_question()
+    get_answers()
+    create_quiz_question()
+    check_question_type()
+    
 
 def handle_incorrect_answer():
     global correct_answer
     print(f"\nSorry, that's incorrect. The correct answer is {html.unescape(correct_answer)}\n\n")
     increase_question_number()
-    generate_new_question()
+    increase_index_number()
+    get_question()
+    get_answers()
+    create_quiz_question()
+    check_question_type()
 
 def check_answer(user_response):
     global data, correct_answer
@@ -70,7 +85,7 @@ def multiple_choice_question():
 
 def check_question_type():
     global question, data
-    type = data['results'][0]['type']
+    type = data['results'][index]['type']
     if type == 'boolean':
         true_or_false_question()
     if type == 'multiple':
@@ -78,14 +93,14 @@ def check_question_type():
 
 def get_question():
     global question
-    question = data['results'][0]['question'] 
+    question = data['results'][index]['question'] 
     question = html.unescape(question)
 
 
 def get_answers():
     global correct_answer, incorrect_answers, data
-    correct_answer = data['results'][0]['correct_answer']
-    incorrect_answers = data['results'][0]['incorrect_answers']
+    correct_answer = data['results'][index]['correct_answer']
+    incorrect_answers = data['results'][index]['incorrect_answers']
     return correct_answer, incorrect_answers
 
 def create_quiz_question():
@@ -115,13 +130,11 @@ def end_quiz():
     print(f'\nEnd of quiz, you scored {score}\n')
     # print(quiz)
         
-
-
 def generate_new_question():
     global data, quiz
     if question_number <11:
         try:
-            response = requests.get(url)
+            response = requests.get(chosen_genre)
             if response.status_code == 200:
                 data = response.json()
                 get_question()
@@ -136,10 +149,17 @@ def generate_new_question():
     else: 
         end_quiz()
 
+def choose_quiz_genre():
+    global chosen_genre 
+    genre_choice = int(input('Choose your quiz genre.\n Type:\n 0 for general knowledge\n 1 for film\n 2 for music\n 3 for television\n 4 for science and nature\n 5 for sports\n 6 for history\n 7 for geography\nYour choice: '))
+    print("\n")
+    chosen_genre = urls[genre_choice]
+    generate_new_question()
 
 def start_quiz():
     print("\n")
-    generate_new_question()
+    choose_quiz_genre()
+    
 
 
 print('Welcome to the Quiz!\n')
