@@ -1,10 +1,10 @@
 import requests
 import random
 import html
+import csv
 
 question_number = 1
 score = 0
-response = None
 data = None
 question = None
 correct_answer = None
@@ -33,7 +33,7 @@ def handle_correct_answer():
 
 def handle_incorrect_answer():
     global correct_answer
-    print(f"\nSorry, that's incorrect. The correct answer is {correct_answer}\n\n")
+    print(f"\nSorry, that's incorrect. The correct answer is {html.unescape(correct_answer)}\n\n")
     increase_question_number()
     generate_new_question()
 
@@ -91,7 +91,32 @@ def get_answers():
 def create_quiz_question():
     global question_number, correct_answer, incorrect_answers, quiz, question, answer
     quiz[question_number] = {'question': question, 'correct answer': correct_answer, 'incorrect answers': incorrect_answers or []}  
+
+def prepare_data_for_csv():
+    global quiz
+    rows = []
+    for key, value in quiz.items():
+        question_number = key
+        question = value['question']
+        correct_answer = value['correct answer']
+        incorrect_answers = ';'.join(value['incorrect answers'])
+        rows.append([question_number, question, correct_answer, incorrect_answers])
     
+    quiz_file = 'quiz_questions.csv'
+
+    with open(quiz_file, mode='a', newline='', encoding='utf-8') as file:
+        writer = csv.writer(file)
+        writer.writerow(['Question Number','Question', 'Correct Answer', 'Incorrect Answers'])
+        writer.writerows(rows)
+    print('data written to file')
+
+def end_quiz():
+    prepare_data_for_csv()
+    print(f'\nEnd of quiz, you scored {score}\n')
+    # print(quiz)
+        
+
+
 def generate_new_question():
     global data, quiz
     if question_number <11:
@@ -109,8 +134,7 @@ def generate_new_question():
             print('An error occurred')   
             generate_new_question()
     else: 
-        print(f'\nEnd of quiz, you scored {score}\n')
-        print(quiz)
+        end_quiz()
 
 
 def start_quiz():
@@ -145,9 +169,8 @@ if are_you_ready == 'yes':
 
 # next steps:
 # add in choice of quiz type at start
-# add questions to array/object
-# add each object to a file
 # handle errors!!
+# change code to fetch once and then retrieve each question each go
 
 # You should use:
 # done:
@@ -158,8 +181,7 @@ if are_you_ready == 'yes':
 # a for loop or a while loop to reduce repetition
 # functions with returns to make code reusable
 # at least two inbuilt functions (print, input, join)
-    
+# + Write your final results to a file
 
 # to do:
 # + Add comments to explain how your instructor can set up any necessary API keys and briefly how you are using the API
-# + Write your final results to a file
