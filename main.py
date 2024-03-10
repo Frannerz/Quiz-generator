@@ -3,6 +3,8 @@ import random
 import html
 import csv
 
+# FOR SETUP AND INSTRUCTIONS: SEE README.md
+
 index = 0
 question_number = 1
 score = 0
@@ -19,6 +21,7 @@ def generate_random_num(length):
 
 urls = ['https://opentdb.com/api.php?amount=10&category=9','https://opentdb.com/api.php?amount=10&category=11','https://opentdb.com/api.php?amount=10&category=12','https://opentdb.com/api.php?amount=10&category=14','https://opentdb.com/api.php?amount=10&category=17','https://opentdb.com/api.php?amount=10&category=21','https://opentdb.com/api.php?amount=10&category=23', 'https://opentdb.com/api.php?amount=10&category=22']
 #0:general knowledge, 1:film, 2:music, 3:television, 4:science and nature, 5:sports, 6:history, 7:geography
+
 def increase_score():
     global score
     score+=1
@@ -41,7 +44,6 @@ def handle_correct_answer():
     create_quiz_question()
     check_question_type()
     
-
 def handle_incorrect_answer():
     global correct_answer
     print(f"\nSorry, that's incorrect. The correct answer is {html.unescape(correct_answer)}\n\n")
@@ -130,7 +132,7 @@ def end_quiz():
     print(f'\nEnd of quiz, you scored {score}\n')
     # print(quiz)
         
-def generate_new_question():
+def generate_new_questions():
     global data, quiz
     if question_number <11:
         try:
@@ -142,10 +144,10 @@ def generate_new_question():
                 create_quiz_question()
                 check_question_type()
             else:
-                generate_new_question()
+                generate_new_questions()
         except:  
             print('An error occurred')   
-            generate_new_question()
+            
     else: 
         end_quiz()
 
@@ -154,13 +156,12 @@ def choose_quiz_genre():
     genre_choice = int(input('Choose your quiz genre.\n Type:\n 0 for general knowledge\n 1 for film\n 2 for music\n 3 for television\n 4 for science and nature\n 5 for sports\n 6 for history\n 7 for geography\nYour choice: '))
     print("\n")
     chosen_genre = urls[genre_choice]
-    generate_new_question()
+    generate_new_questions()
 
 def start_quiz():
     print("\n")
     choose_quiz_genre()
     
-
 
 print('Welcome to the Quiz!\n')
 are_you_ready = input("Are you ready? Type 'yes' or 'no'! ")
@@ -188,7 +189,7 @@ if are_you_ready == 'yes':
     
 
 # next steps:
-# add in choice of quiz type at start
+# add in play again option!
 # handle errors!!
 # change code to fetch once and then retrieve each question each go
 
