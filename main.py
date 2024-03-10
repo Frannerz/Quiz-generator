@@ -17,7 +17,8 @@ class Quiz:
         self.incorrect_answers = None
         self.quiz = {}
         self.urls = ['https://opentdb.com/api.php?amount=10&category=9','https://opentdb.com/api.php?amount=10&category=11','https://opentdb.com/api.php?amount=10&category=12','https://opentdb.com/api.php?amount=10&category=14','https://opentdb.com/api.php?amount=10&category=17','https://opentdb.com/api.php?amount=10&category=21','https://opentdb.com/api.php?amount=10&category=23', 'https://opentdb.com/api.php?amount=10&category=22']
-    
+        self.genres = ['general Knowledge', 'film', 'music', 'television', 'science and nature','sports', 'history', 'geography']
+
     def increase_score(self):
         self.score+=1
 
@@ -62,9 +63,15 @@ class Quiz:
         return [html.unescape(word) for word in answers]
 
     def true_or_false_question(self):
-        print(f"{self.question_number}. {self.question}\n")
-        user_response = input("Type 'True' or 'False': ")
-        self.check_answer(user_response)
+        print(f"Question {self.question_number}. {self.question}\n")
+        while True:
+            user_response = input("Type 'True' or 'False': ")
+            if user_response.lower() == 'true' or user_response.lower() == 'false':
+                self.check_answer(user_response)
+                break
+            else:
+                print('Please enter true or false: ')
+        
 
     def format_multiple_choice_answers(self, answers):
         return ', '.join(answers[0:3])+ " or "+ answers[3] +"?"
@@ -75,10 +82,18 @@ class Quiz:
         possible_answers.insert(random_num, self.correct_answer)
         possible_answers = self.format_answers(possible_answers)
         possible_answers = self.format_multiple_choice_answers(possible_answers)
-        print(f"{self.question_number}. {self.question}\n")
+        print(f"Question {self.question_number}. {self.question}\n")
         print(possible_answers, "\n")
-        user_response = input('Enter the correct answer: ')
-        self.check_answer(user_response)
+        while True:
+            user_response = input('Enter the correct answer: ').strip()
+            user_response = html.escape(user_response)
+            if user_response == '':
+                print('Please enter a response')
+            elif user_response in possible_answers:
+                self.check_answer(user_response)
+                break
+            else:
+                print('Please enter an answer from the list.')
 
     def check_question_type(self):
         type = self.data['results'][self.index]['type']
@@ -142,10 +157,26 @@ class Quiz:
                 self.generate_new_questions()
         except Exception as e:  
             print(f'An error occurred: {e}')   
+
+    def generate_title(self, index):
+        genre = self.genres[index]
+        length = len(genre)+21
+        stars = '*' * length
+        print(f'\n{stars}\nWelcome to the {genre} quiz!\n{stars}\n')
             
     def choose_quiz_genre(self):
-        genre_choice = int(input('Choose your quiz genre.\n Type:\n 0 for general knowledge\n 1 for film\n 2 for music\n 3 for television\n 4 for science and nature\n 5 for sports\n 6 for history\n 7 for geography\nYour choice: '))
+        while True:
+            try:
+                genre_choice = int(input('Choose your quiz genre.\n Type:\n 0 for general knowledge\n 1 for film\n 2 for music\n 3 for television\n 4 for science and nature\n 5 for sports\n 6 for history\n 7 for geography\nYour choice: '))
+                if 0 <= genre_choice <= 7:
+                    break
+                else: 
+                    print('\nPlease type an integer between 0 and 7\n')
+            except ValueError:
+                print("\nThat's not an integer. Please try again with a number between 0 and 7.\n")
+    
         self.chosen_genre = self.urls[genre_choice]
+        self.generate_title(genre_choice)
         self.generate_new_questions()
     
     def start_quiz(self):
@@ -168,38 +199,19 @@ print('\nWelcome to the Quiz!\n')
 
 def ready_to_play():
     are_you_ready = input("Are you ready? Type 'yes' or 'no'! ")
-    if are_you_ready == 'yes':
+    while are_you_ready == '':
+        are_you_ready = input("Please type 'yes' or 'no'! ")
+    if are_you_ready.lower() == 'yes':
         new_quiz()
     else:
-        print('Hope to see you soon!') 
+        print('Hope to see you soon!\n') 
 
 ready_to_play()
 
-# def stop_all():
-#     print('Thanks for playing! See you soon')
-
-# functions: random_number, check_question_type, check_answer, correct_answer, 
-# incorrect_answer, new_question, increase_score
-
-#when creating list, insert correct item into random position in correct list
-
-# #for loop with range 10 (or have number_of_questions variable?), 
-# # calls url, asks question and puts answers in a list
-# # if the inoput reponse.lower() == results.correct_answer.lower(), add 1 to score and say correct!
-# # if not correct say sorry, incorrect and give correct answer
-# # tell user their score
-# # trigger next question
-# # after 10 questions- give user their score- you scored 5/10 points!
-# # ask question- do you want to play again? if yes- start again!
-
-
-# Bugs:
-    
 
 # next steps:
-# add in play again option!
-# handle errors!!
-# change code to fetch once and then retrieve each question each go
+# validate responses
+
 
 # You should use:
 # done:
