@@ -4,13 +4,13 @@ import html
 
 question_number = 1
 score = 0
+response = None
 data = None
 question = None
 correct_answer = None
 incorrect_answers = None
 quiz = {}
-# char_strings = ['&ldquo;','&quot;', '&oacute;','&#039;','&rsquo;']
-# char_string_replace = [""]
+
 
 def generate_random_num(length):
     return random.randint(0,length)
@@ -76,10 +76,6 @@ def check_question_type():
     if type == 'multiple':
         multiple_choice_question()
 
-# def format_string(string):
-#     global char_strings
-#     pass
-
 def get_question():
     global question
     question = data['results'][0]['question'] 
@@ -99,13 +95,20 @@ def create_quiz_question():
 def generate_new_question():
     global data, quiz
     if question_number <11:
-        response = requests.get(url)
-        data = response.json()
-        get_question()
-        get_answers()
-        create_quiz_question()
-        check_question_type()
-    else:
+        try:
+            response = requests.get(url)
+            if response.status_code == 200:
+                data = response.json()
+                get_question()
+                get_answers()
+                create_quiz_question()
+                check_question_type()
+            else:
+                generate_new_question()
+        except:  
+            print('An error occurred')   
+            generate_new_question()
+    else: 
         print(f'\nEnd of quiz, you scored {score}\n')
         print(quiz)
 
@@ -113,6 +116,7 @@ def generate_new_question():
 def start_quiz():
     print("\n")
     generate_new_question()
+
 
 print('Welcome to the Quiz!\n')
 are_you_ready = input("Are you ready? Type 'yes' or 'no'! ")
@@ -137,9 +141,6 @@ if are_you_ready == 'yes':
 
 
 # Bugs:
-# replace chars in questions: &ldquo;    &quot;  &oacute;  &#039;  &rsquo;
-# use find and replace
-# join list to remove brackets in question
     
 
 # next steps:
@@ -154,11 +155,11 @@ if are_you_ready == 'yes':
 # string slicing
 # any free API to get some information as json.
 # Import an additional module and use it. If it needs to be installed, explain how to do that in the comments, and briefly note what it is for.
-
-
-# to do:
 # a for loop or a while loop to reduce repetition
 # functions with returns to make code reusable
-# at least two inbuilt functions
+# at least two inbuilt functions (print, input, join)
+    
+
+# to do:
 # + Add comments to explain how your instructor can set up any necessary API keys and briefly how you are using the API
 # + Write your final results to a file
