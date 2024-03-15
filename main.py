@@ -5,6 +5,7 @@ import csv
 
 # FOR SETUP AND INSTRUCTIONS: SEE README.md
 
+# Quiz class
 class Quiz: 
     def __init__(self):
         self.index = 0
@@ -113,7 +114,7 @@ class Quiz:
 
     def create_quiz_question(self):
         self.quiz[self.question_number] = {'question': self.question, 'correct answer': self.correct_answer, 'incorrect answers': self.incorrect_answers}  
-
+        
     def prepare_data_for_csv(self):
         rows = []
         for key, value in self.quiz.items():
@@ -190,12 +191,14 @@ class Quiz:
 def generate_random_num(length):
     return random.randint(0,length)
 
+# FUNCTION TO CREATE INSTANCE OF QUIZ CLASS
 def new_quiz():
     start_new_quiz = Quiz()
     start_new_quiz.start_quiz()
 
 # START THE GAME
 print('\nWelcome to the Quiz!\n')
+
 
 def ready_to_play():
     are_you_ready = input("Are you ready? Type 'yes' or 'no'! ")
