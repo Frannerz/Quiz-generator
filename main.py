@@ -89,7 +89,7 @@ class Quiz:
             user_response = html.escape(user_response)
             if user_response == '':
                 print('Please enter a response')
-            elif user_response in possible_answers:
+            elif user_response.lower() in possible_answers.lower():
                 self.check_answer(user_response)
                 break
             else:
@@ -129,7 +129,7 @@ class Quiz:
             writer = csv.writer(file)
             writer.writerow(['Question Number','Question', 'Correct Answer', 'Incorrect Answers'])
             writer.writerows(rows)
-        print('data written to file')
+        print('Quiz written to file!')
 
     def play_again(self):
         play_again_choice = input("Do you want to play again?\n Enter 'yes' or 'no': ")
@@ -208,21 +208,3 @@ def ready_to_play():
 
 ready_to_play()
 
-
-# next steps:
-# validate responses
-
-
-# You should use:
-# done:
-# boolean values and if..else statements to branch logic of your program a data structure like a list, dictionary, set or tuple to store values
-# string slicing
-# any free API to get some information as json.
-# Import an additional module and use it. If it needs to be installed, explain how to do that in the comments, and briefly note what it is for.
-# a for loop or a while loop to reduce repetition
-# functions with returns to make code reusable
-# at least two inbuilt functions (print, input, join)
-# + Write your final results to a file
-
-# to do:
-# + Add comments to explain how your instructor can set up any necessary API keys and briefly how you are using the API
