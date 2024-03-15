@@ -89,7 +89,7 @@ class Quiz:
             user_response = html.escape(user_response)
             if user_response == '':
                 print('Please enter a response')
-            elif user_response in possible_answers:
+            elif user_response.lower() in possible_answers.lower():
                 self.check_answer(user_response)
                 break
             else:
@@ -129,7 +129,7 @@ class Quiz:
             writer = csv.writer(file)
             writer.writerow(['Question Number','Question', 'Correct Answer', 'Incorrect Answers'])
             writer.writerows(rows)
-        print('data written to file')
+        print('Quiz written to file!')
 
     def play_again(self):
         play_again_choice = input("Do you want to play again?\n Enter 'yes' or 'no': ")
